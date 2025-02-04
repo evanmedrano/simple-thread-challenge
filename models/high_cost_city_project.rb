@@ -1,0 +1,2 @@
+class HighCostCityProject < Project
+end

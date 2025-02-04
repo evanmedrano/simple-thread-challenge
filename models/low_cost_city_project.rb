@@ -1,0 +1,2 @@
+class LowCostCityProject < Project
+end
