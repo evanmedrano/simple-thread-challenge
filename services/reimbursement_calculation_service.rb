@@ -21,10 +21,18 @@ class ReimbursementCalculationService
   def calculate_project_set
     result = 0
     latest_date = nil
+    latest_cost = nil
 
     project_set.each do |project|
       project.dates.each do |date|
-        next if latest_date == date
+        if latest_date == date
+          # Handle overlaps with the high cost city not being first
+          if project.cost == 'high' && latest_cost == 'low'
+            result -= remove_full_reimbursement(project, date)
+          else
+            next
+          end
+        end
 
         if determine_travel_days.include?(date)
           result += add_travel_reimbursement(project, date)
@@ -33,6 +41,7 @@ class ReimbursementCalculationService
         end
 
         latest_date = date
+        latest_cost = project.cost
       end
     end
 
@@ -46,7 +55,7 @@ class ReimbursementCalculationService
     cost = project.cost
 
     if output_result
-      puts "Date #{date.strftime('%m/%d/%Y')} is a travel day. Reimbursement rate is #{rate} for a #{cost} cost city."
+      puts "Date #{date} is a travel day. Reimbursement rate is #{rate} for a #{cost} cost city."
     end
 
     rate
@@ -57,7 +66,17 @@ class ReimbursementCalculationService
     cost = project.cost
 
     if output_result
-      puts "Date #{date.strftime('%m/%d/%Y')} is a full day. Reimbursement rate is #{rate} for a #{cost} cost city."
+      puts "Date #{date} is a full day. Reimbursement rate is #{rate} for a #{cost} cost city."
+    end
+
+    rate
+  end
+
+  def remove_full_reimbursement(project, date)
+    rate = 75
+
+    if output_result
+      puts "Removing reimbursement rate of #{rate} for a low cost city on #{date}."
     end
 
     rate
