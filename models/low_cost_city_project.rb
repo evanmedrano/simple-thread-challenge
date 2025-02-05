@@ -1,2 +1,0 @@
-class LowCostCityProject < Project
-end

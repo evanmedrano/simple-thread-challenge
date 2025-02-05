@@ -1,2 +1,0 @@
-class HighCostCityProject < Project
-end
